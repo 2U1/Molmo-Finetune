@@ -39,7 +39,7 @@ class TrainingArguments(TrainingArguments):
         metadata={"help": "Quantization data type to use. Should be one of `fp4` or `nf4`."}
     )
     bits: int = field(
-        default=16,
+        default=32,
         metadata={"help": "How many bits to use."}
     )
     lora_enable: bool = False
@@ -53,6 +53,7 @@ class TrainingArguments(TrainingArguments):
     projector_lr: Optional[float] = None
     lora_namespan_exclude: str = field(default=None, metadata={"help": "List of namespan to exclude for LoRA"})
     num_lora_modules: int = -1
+    use_liger_kernel: bool = False
 
 
 @dataclass
@@ -62,3 +63,4 @@ class DataArguments:
     )
     lazy_preprocess: bool = False
     image_folder: Optional[str] = field(default=None)
+    fps: int = 10

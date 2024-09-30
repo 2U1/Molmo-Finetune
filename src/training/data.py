@@ -66,8 +66,6 @@ class SupervisedDataset(Dataset):
         self.list_data_dict = list_data_dict
         self.data_args = data_args
         self.padding = padding
-        self.min_pixel = data_args.min_pixels
-        self.max_pixel = data_args.max_pixels
         self.fps = data_args.fps
 
     def __len__(self):
@@ -112,25 +110,28 @@ class SupervisedDataset(Dataset):
 
         sources = copy.deepcopy(llava_to_openai(sources['conversations'], is_video=is_video))
 
-        all_input_ids = [torch.tensor([151643])] # bos token id
+        all_input_ids = [torch.tensor([151643])] # bos token id = eos token id
         all_labels = [torch.tensor([-100])] # ignore bos token
-        all_pixel_values = []
-        all_image_sizes = []
+        all_images = []
+        all_image_masks = []
+        all_image_input_idx = []
 
         for idx, j in enumerate(range(0, len(sources), 2)):
             user_input = sources[j]
             gpt_response = sources[j + 1]
 
-            user_input = f"{DEFAULT_IM_START_TOKEN}{user_input['role']}\n{user_input['content']}\n{DEFAULT_IM_END_TOKEN}\n{DEFAULT_IM_START_TOKEN}{gpt_response['role']}\n"
-            gpt_response = f"{gpt_response['content']}\n{DEFAULT_IM_END_TOKEN}\n"
+            gpt_response = f" {gpt_response['content']}"
             
             if idx == 0:
-                inputs = processor(text=[user_input], images=images, videos=videos, padding=False, return_tensors='pt')
-                prompt_input_ids = inputs['input_ids']
-                all_pixel_values.append(inputs[pixel_key])
-                all_image_grid_thw.append(inputs[grid_key])
+                user_input = user_input['content']
+                inputs = processor.process(text=user_input, images=images)
+                prompt_input_ids = inputs['input_ids'].unsqueeze(0)
+                all_images.append(inputs['images'].unsqueeze(0))
+                all_image_input_idx.append(inputs['image_input_idx'].unsqueeze(0))
+                all_image_masks.append(inputs['image_masks'].unsqueeze(0))
 
             else:
+                user_input = f" {user_input['role'].capitalize()}: {user_input['content']} {gpt_response['role'].capitalize()}"
                 prompt_input_ids = processor.tokenizer(user_input, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
 
             response_input_ids = processor.tokenizer(gpt_response, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
@@ -148,16 +149,16 @@ class SupervisedDataset(Dataset):
             all_labels.append(labels)
 
         
-        # There is no need for eos or bos tokens in the input_ids
-        # Qwen2-VL doees not use them
+        all_input_ids.append(torch.tensor([151643]))  # eos token id
+        all_labels.append(torch.tensor([151643]))  # eos token id
+        
         input_ids = torch.cat(all_input_ids, dim=0).to(torch.long)
         labels = torch.cat(all_labels, dim=0).to(torch.long)
 
-        # eos_token_id = processor.tokenizer.convert_tokens_to_ids(DEFAULT_IM_END_TOKEN)
-        # input_ids, labels = truncate_sequence(input_ids, labels, self.max_length, eos_token_id)
+        images = torch.cat(all_images, dim=0)
+        image_input_idx = torch.cat(all_image_input_idx, dim=0)
+        image_masks = torch.cat(all_image_masks, dim=0)
 
-        pixel_values = torch.cat(all_pixel_values, dim=0)
-        image_thw = torch.cat(all_image_grid_thw, dim=0)
 
         attention_mask = (input_ids > -1000000).to(torch.long)
 
@@ -165,10 +166,10 @@ class SupervisedDataset(Dataset):
             input_ids=input_ids,
             attention_mask=attention_mask,
             labels=labels,
+            images=images,
+            image_input_idx=image_input_idx,
+            image_masks=image_masks,
         )
-
-        data_dict[pixel_key] = pixel_values
-        data_dict[grid_key] = image_thw
         
         return data_dict
 
@@ -181,24 +182,16 @@ class DataCollatorForSupervisedDataset(object):
     def __call__(self, examples):
         batch_input_ids = []
         batch_label_ids = []
-        batch_pixel_values = []
-        batch_image_thw = []
-
-        sample = examples[0]
-
-        if "pixel_values_videos" in sample:
-            grid_key = "video_grid_thw"
-            pixel_key = "pixel_values_videos"
-
-        else:
-            grid_key = "image_grid_thw"
-            pixel_key = "pixel_values"
+        batch_images = []
+        batch_image_input_idx = []
+        batch_image_mask = []
 
         for example in examples:
             batch_input_ids.append(example["input_ids"])
             batch_label_ids.append(example["labels"])
-            batch_pixel_values.append(example[pixel_key])
-            batch_image_thw.append(example[grid_key])
+            batch_images.append(example["images"])
+            batch_image_input_idx.append(example["image_input_idx"])
+            batch_image_mask.append(example["image_masks"])
         
         input_ids = pad_sequence(
             batch_input_ids, padding_side='right', padding_value=self.pad_token_id
@@ -206,25 +199,27 @@ class DataCollatorForSupervisedDataset(object):
 
         attention_mask = input_ids != self.pad_token_id
         labels = pad_sequence(batch_label_ids, padding_side='right', padding_value=IGNORE_INDEX)
-        pixel_values = torch.cat(batch_pixel_values, dim=0)
-        image_thw = torch.cat(batch_image_thw, dim=0)
+        
+        images = torch.cat(batch_images, dim=0)
+        image_input_idx = torch.cat(batch_image_input_idx, dim=0)
+        image_masks = torch.cat(batch_image_mask, dim=0)
 
         return {
-            'input_ids': input_ids,
-            'labels': labels,
-            'attention_mask': attention_mask,
-            pixel_key: pixel_values,
-            grid_key: image_thw,
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "labels": labels,
+            "images": images,
+            "image_input_idx": image_input_idx,
+            "image_masks": image_masks
         }
-    
 
 def replace_image_tokens(input_string, is_video=False):
 
     if is_video:
-        input_string = input_string.replace(LLAVA_VIDEO_TOKEN+'\n', VISION_START_TOKEN+DEFAULT_VIDEO_TOKEN+VISION_END_TOKEN)
+        input_string = input_string.replace(LLAVA_VIDEO_TOKEN+'\n', '')
 
     else:
-        input_string = input_string.replace(LLAVA_IMAGE_TOKEN+'\n', VISION_START_TOKEN+DEFAULT_IMAGE_TOKEN+VISION_END_TOKEN)
+        input_string = input_string.replace(LLAVA_IMAGE_TOKEN+'\n', '')
 
     return input_string
 

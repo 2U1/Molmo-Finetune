@@ -50,6 +50,9 @@ def configure_vision_tower(model, training_args, compute_dtype, device):
     vision_proj_param = vision_tower.image_projector.parameters()
     set_requires_grad(vision_proj_param, training_args.tune_projector)
 
+    # if training_args.bits in [4, 8]:
+    #     vision_tower.to(dtype=compute_dtype, device=device)
+
 def configure_llm(model, training_args):
     llm_params = model.transformer.parameters()
     set_requires_grad(llm_params, not training_args.freeze_llm)
@@ -75,7 +78,7 @@ def train():
             training_args.lora_namespan_exclude = []
 
         if not training_args.vision_lora:
-            training_args.lora_namespan_exclude += ["visual"]
+            training_args.lora_namespan_exclude += ["vision_backbone"]
 
     local_rank = training_args.local_rank
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
