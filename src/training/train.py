@@ -50,8 +50,8 @@ def configure_vision_tower(model, training_args, compute_dtype, device):
     vision_proj_param = vision_tower.image_projector.parameters()
     set_requires_grad(vision_proj_param, training_args.tune_projector)
 
-    # if training_args.bits in [4, 8]:
-    #     vision_tower.to(dtype=compute_dtype, device=device)
+    if training_args.bits in [4, 8]:
+        vision_tower.to(dtype=compute_dtype, device=device)
 
 def configure_llm(model, training_args):
     llm_params = model.transformer.parameters()

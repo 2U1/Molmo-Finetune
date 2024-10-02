@@ -23,7 +23,7 @@ deepspeed src/training/train.py \
     --freeze_vision_tower False \
     --freeze_llm False \
     --tune_projector True \
-    --bf16 False \
+    --bf16 True \
     --fp16 False \
     --disable_flash_attn2 False \
     --output_dir output/lora_vision_test \

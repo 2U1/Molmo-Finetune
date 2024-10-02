@@ -1,13 +1,12 @@
 #!/bin/bash
 
-# You can use phi3 instead of phi3.5
-MODEL_NAME="Qwen/Qwen2-VL-7B-Instruct"
-# MODEL_NAME="Qwen/Qwen2-VL-2B-Instruct"
+MODEL_NAME="allenai/Molmo-7B-D-0924"
+# MODEL_NAME="allenai/Molmo-7B-O-0924"
 
 export PYTHONPATH=src:$PYTHONPATH
 
 python src/merge_lora_weights.py \
-    --model-path /home/workspace/Qwen2-VL-Finetune/output/testing_lora \
+    --model-path /path/to/your/model \
     --model-base $MODEL_NAME  \
-    --save-model-path /home/workspace/Qwen2-VL-Finetune/output/merge_test \
+    --save-model-path /output/directory \
     --safe-serialization

@@ -5,7 +5,7 @@ This repository contains a script for training [Molmo Series](https://huggingfac
 
 However the model uploaded at the huggingfece hub is a sort of a preview version that has few limitations.
 
-- **Only supports fp32**
+- **Only supports fp32 (Can supprot fp16 or bf16 however not stable)**
 - **Only single-image is supported**
 - **Grad Checkpointing disabled**
 - **Flash-attention and sdpa disabled**
@@ -21,13 +21,23 @@ I'll update some other features for memory efficient ways. (Also when the offici
 
 ## Table of Contents
 
-- [Installation](#installation)
-  - [Using `environment.yaml`](#using-environmentyaml)
-- [Dataset Preparation](#dataset-preparation)
-- [Training](#training)
-  - [Full Finetuning](#full-finetuning)
-  - [Finetune with LoRA](#finetune-with-lora)
-    - [Merge LoRA Weights](#merge-lora-weights)
+- [Molmo-Finetune](#molmo-finetune)
+  - [Other projects](#other-projects)
+  - [Table of Contents](#table-of-contents)
+  - [Supported Features](#supported-features)
+  - [Installation](#installation)
+    - [Using `environment.yaml`](#using-environmentyaml)
+  - [Dataset Preparation](#dataset-preparation)
+  - [Training](#training)
+    - [Full Finetuning](#full-finetuning)
+    - [Finetune with LoRA](#finetune-with-lora)
+      - [Merge LoRA Weights](#merge-lora-weights)
+      - [Issue for libcudnn error](#issue-for-libcudnn-error)
+  - [TODO](#todo)
+  - [Known Issues](#known-issues)
+  - [License](#license)
+  - [Citation](#citation)
+  - [Acknowledgement](#acknowledgement)
 
 ## Supported Features
 
@@ -95,6 +105,8 @@ The script requires a dataset formatted according to the LLaVA specification. Th
 </details>
 
 ## Training
+
+**Note:** The model was updated to use bf16 or fp16 however, the output could be chagned compared to fp32.
 
 To run the training script, use the following command:
 
