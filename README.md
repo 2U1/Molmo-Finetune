@@ -1,6 +1,5 @@
 # Molmo-Finetune
 
-An open-source implementaion for fine-tuning Molmo-7B-D and Molmo-7B-O.
 This repository contains a script for training [Molmo Series](https://huggingface.co/collections/allenai/molmo-66f379e6fe3b8ef090a8ca19) with using HuggingFace.
 
 However the model uploaded at the huggingfece hub is a sort of a preview version that has few limitations.
