@@ -67,6 +67,7 @@ class SupervisedDataset(Dataset):
         self.data_args = data_args
         self.padding = padding
         self.fps = data_args.fps
+        self.eos_token_id = processor.tokenizer.eos_token_id
 
     def __len__(self):
         return len(self.list_data_dict)
@@ -110,7 +111,7 @@ class SupervisedDataset(Dataset):
 
         sources = copy.deepcopy(llava_to_openai(sources['conversations'], is_video=is_video))
 
-        all_input_ids = [torch.tensor([151643])] # bos token id = eos token id
+        all_input_ids = [torch.tensor([self.eos_token_id])] # bos token id = eos token id
         all_labels = [torch.tensor([-100])] # ignore bos token
         all_images = []
         all_image_masks = []
@@ -149,8 +150,8 @@ class SupervisedDataset(Dataset):
             all_labels.append(labels)
 
         
-        all_input_ids.append(torch.tensor([151643]))  # eos token id
-        all_labels.append(torch.tensor([151643]))  # eos token id
+        all_input_ids.append(torch.tensor([self.eos_token_id]))  # eos token id
+        all_labels.append(torch.tensor([self.eos_token_id]))  # eos token id
         
         input_ids = torch.cat(all_input_ids, dim=0).to(torch.long)
         labels = torch.cat(all_labels, dim=0).to(torch.long)
