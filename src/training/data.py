@@ -120,8 +120,8 @@ class SupervisedDataset(Dataset):
         for idx, j in enumerate(range(0, len(sources), 2)):
             user_input = sources[j]
             gpt_response = sources[j + 1]
-
-            gpt_response = f" {gpt_response['content']}"
+            
+            gpt_prompt = f" {gpt_response['content']}"
             
             if idx == 0:
                 user_input = user_input['content']
@@ -135,12 +135,12 @@ class SupervisedDataset(Dataset):
                 user_input = f" {user_input['role'].capitalize()}: {user_input['content']} {gpt_response['role'].capitalize()}"
                 prompt_input_ids = processor.tokenizer(user_input, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
 
-            response_input_ids = processor.tokenizer(gpt_response, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
+            response_input_ids = processor.tokenizer(gpt_prompt, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
 
             input_ids = torch.cat([prompt_input_ids, response_input_ids], dim=1).squeeze(0)
             labels = torch.cat(
                 [
-                    torch.tensor([IGNORE_INDEX] * len(prompt_input_ids[0])),  
+                    torch.tensor([IGNORE_INDEX] * len(prompt_input_ids[0])),
                     response_input_ids.squeeze(0),
                 ],
                 dim=0,
