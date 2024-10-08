@@ -177,7 +177,6 @@ def train():
 
     trainer = MolmoTrainer(
         model=model,
-        processor=processor,
         args=training_args,
         **data_module
     )
