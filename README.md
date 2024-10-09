@@ -117,6 +117,8 @@ bash scripts/finetune.sh
 
 ### Finetune with LoRA
 
+**IMPORTANT:** As the model is a preview version, it is a bit unstable when using LoRA. It is preferred to use full finetuning for now.
+
 If you want to train only the language model with LoRA and perform full training for the vision model:
 
 ```bash
