@@ -6,14 +6,16 @@ MODEL_NAME="allenai/Molmo-7B-D-0924"
 
 export PYTHONPATH=src:$PYTHONPATH
 
-# If you want to tune the `embed_token` with LoRA, You need to tune `lm_head` together
+# ff_out is the lm_head layer in other models.
+# I can't fine the exact embed_token so, its better to just tune the ff_out too.
+# --lora_namespan_exclude "['ff_out']"
 
 # Currently, molmo does not support gradient_checkpointing
 # Also it only supports fp32 training
 
-deepspeed src/training/train.py \
+torchrun --nproc_per_node=1 \ 
+    src/training/train.py \
     --lora_enable True \
-    --lora_namespan_exclude "['lm_head', 'embed_tokens']" \
     --lora_rank 64 \
     --lora_alpha 128 \
     --lora_dropout 0.05 \

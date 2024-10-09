@@ -20,6 +20,10 @@ def find_target_linear_names(model, num_lora_modules=-1, lora_namespan_exclude=[
     embedding_cls = torch.nn.modules.Embedding
     lora_module_names = []
 
+    if 'ff_out' in lora_namespan_exclude:
+        lora_namespan_exclude.remove('ff_out')
+        lora_namespan_exclude += ['transformer.ff_out']
+
     for name, module in model.named_modules():
         if any(ex_keyword in name for ex_keyword in lora_namespan_exclude):
             continue
@@ -167,7 +171,7 @@ def train():
             if 'norm' in name:
                 module = module.to(torch.float32)
             
-            if 'lm_head' in name or 'embed_token' in name:
+            if 'transformer.ff_out' in name or 'embed_token' in name:
                 if hasattr(module, 'weight'):
                     if training_args.bf16 and module.weight.dtype == torch.float32:
                         module = module.to(torch.bfloat16)

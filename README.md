@@ -129,7 +129,8 @@ If you want to train both the language model and the vision model with LoRA:
 bash scripts/finetune_lora_vision.sh
 ```
 
-**IMPORTANT:** If you want to tune the `embed_token` with LoRA, You need to tune `lm_head` together.
+~~**IMPORTANT:** If you want to tune the `wte` with LoRA, You need to tune `ff_out` (that is `lm_head` in other models) together.~~
+**NOTE:** I couldn't exactly find the `embedding layer` that has weight so, the `ff_out` layer should be fine tuned temporarily.
 
 <details>
 <summary>Training arguments</summary>

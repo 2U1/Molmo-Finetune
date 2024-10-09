@@ -42,11 +42,15 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             del lora_cfg_pretrained.quantization_config
         processor = AutoProcessor.from_pretrained(model_base, trust_remote_code=True)
         print('Loading Molmo from base model...')
-        model = AutoModelForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, trust_remote_code=True, **kwargs)
-        token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
-        if model.lm_head.weight.shape[0] != token_num:
-            model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
-            model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
+        # model = AutoModelForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, trust_remote_code=True, **kwargs)
+
+        # Using the default config from the huggingface model
+        # Looks like the model doesn't accpet the config local config argument for now.
+        model = AutoModelForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, trust_remote_code=True, **kwargs)
+        token_num, tokem_dim = model.model.transformer.ff_out.out_features, model.model.transformer.ff_out.in_features
+        if model.model.transformer.ff_out.weight.shape[0] != token_num:
+            model.model.transformer.ff_out.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
+            model.model.transformer.wte.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
 
         print('Loading additional Molmo weights...')
         non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_state_dict.bin'), map_location='cpu')

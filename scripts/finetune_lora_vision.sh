@@ -6,12 +6,14 @@ MODEL_NAME="allenai/Molmo-7B-D-0924"
 
 export PYTHONPATH=src:$PYTHONPATH
 
-# If you want to tune the `embed_token` with LoRA, You need to tune `lm_head` together
+# If you want to tune the `wte` with LoRA, You need to tune `ff_out` together
+# ff_out is the lm_head layer in other models.
+# I can't fine the exact embed_token so, its better to just tune the ff_out too.
+# --lora_namespan_exclude "['ff_out']"
 
 deepspeed src/training/train.py \
     --lora_enable True \
     --vision_lora True \
-    --lora_namespan_exclude "['lm_head', 'embed_tokens']" \
     --lora_rank 64 \
     --lora_alpha 128 \
     --lora_dropout 0.05 \
