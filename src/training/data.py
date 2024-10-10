@@ -124,16 +124,16 @@ class SupervisedDataset(Dataset):
             gpt_prompt = f" {gpt_response['content']}"
             
             if idx == 0:
-                user_input = user_input['content']
-                inputs = processor.process(text=user_input, images=images)
+                user_prompt = user_input['content']
+                inputs = processor.process(text=user_prompt, images=images)
                 prompt_input_ids = inputs['input_ids'].unsqueeze(0)
                 all_images.append(inputs['images'].unsqueeze(0))
                 all_image_input_idx.append(inputs['image_input_idx'].unsqueeze(0))
                 all_image_masks.append(inputs['image_masks'].unsqueeze(0))
 
             else:
-                user_input = f" {user_input['role'].capitalize()}: {user_input['content']} {gpt_response['role'].capitalize()}"
-                prompt_input_ids = processor.tokenizer(user_input, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
+                user_prompt = f" {user_input['role'].capitalize()}: {user_input['content']} {gpt_response['role'].capitalize()}"
+                prompt_input_ids = processor.tokenizer(user_prompt, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
 
             response_input_ids = processor.tokenizer(gpt_prompt, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
 

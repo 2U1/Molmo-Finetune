@@ -37,9 +37,9 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
     if 'lora' in model_name.lower() and model_base is None:
         warnings.warn('There is `lora` in model name but no `model_base` is provided. If you are loading a LoRA model, please provide the `model_base` argument.')
     if 'lora' in model_name.lower() and model_base is not None:
-        lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)
-        if hasattr(lora_cfg_pretrained, 'quantization_config'):
-            del lora_cfg_pretrained.quantization_config
+        # lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)
+        # if hasattr(lora_cfg_pretrained, 'quantization_config'):
+        #     del lora_cfg_pretrained.quantization_config
         processor = AutoProcessor.from_pretrained(model_base, trust_remote_code=True)
         print('Loading Molmo from base model...')
         # model = AutoModelForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, trust_remote_code=True, **kwargs)
@@ -49,6 +49,7 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
         model = AutoModelForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, trust_remote_code=True, **kwargs)
         token_num, tokem_dim = model.model.transformer.ff_out.out_features, model.model.transformer.ff_out.in_features
         if model.model.transformer.ff_out.weight.shape[0] != token_num:
+            print('Resizing the model to match the Molmo token size...')
             model.model.transformer.ff_out.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
             model.model.transformer.wte.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
 
