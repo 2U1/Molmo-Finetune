@@ -9,14 +9,17 @@ However the model uploaded at the huggingfece hub is a sort of a preview version
 - **Grad Checkpointing disabled**
 - **Flash-attention and sdpa disabled**
 
-These makes the code uses a lot of vram, that you should use some other techniques like `Adam8Bit`, `LOMO` and some other things.
-I'll update some other features for memory efficient ways. (Also when the official repo is updated.)
+**Note:** This repo isn't maintained until the official version (Not the preview one) is released.
 
 ## Other projects
 
 **[[Phi3-Vision Finetuning]](https://github.com/2U1/Phi3-Vision-Finetune)**<br>
 **[[Qwen2-VL Finetuning]](https://github.com/2U1/Qwen2-VL-Finetune)**<br>
 **[[LLAMA3.2-Vision Finetuning]](https://github.com/2U1/Llama3.2-Vision-Finetune)**
+
+## Update
+
+- [2024/12/04] Add memory efficient 8-bit training.
 
 ## Table of Contents
 

@@ -13,13 +13,8 @@ export PYTHONPATH=src:$PYTHONPATH
 # Currently, molmo does not support gradient_checkpointing
 # Also it only supports fp32 training
 
-deepspeed src/training/train.py \
-    --lora_enable True \
-    --lora_rank 64 \
-    --lora_alpha 128 \
-    --lora_dropout 0.05 \
-    --num_lora_modules 10 \
-    --deepspeed scripts/zero3_offload.json \
+accelerate launch --fp8_backend=msamp --fp8_opt_level=O2 src/training/train.py \
+    --deepspeed scripts/zero3.json \
     --model_id $MODEL_NAME \
     --data_path /path/to/your/training/data.json \
     --image_folder /path/to/your/image/folder \

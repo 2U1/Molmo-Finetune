@@ -8,7 +8,7 @@ export PYTHONPATH=src:$PYTHONPATH
 
 # If you want to tune the `wte` with LoRA, You need to tune `ff_out` together
 # ff_out is the lm_head layer in other models.
-# I can't fine the exact embed_token so, its better to just tune the ff_out too.
+# I can't find the exact embed_token so, its better to just tune the ff_out too.
 # --lora_namespan_exclude "['ff_out']"
 
 deepspeed src/training/train.py \
