@@ -20,12 +20,14 @@ However the model uploaded at the huggingfece hub is a sort of a preview version
 
 ## Update
 
+- [2025/01/11] Updated 8-bit training with ms_amp using opt_level O3.
 - [2024/12/04] Add memory efficient 8-bit training.
 
 ## Table of Contents
 
 - [Molmo-Finetune](#molmo-finetune)
   - [Other projects](#other-projects)
+  - [Update](#update)
   - [Table of Contents](#table-of-contents)
   - [Supported Features](#supported-features)
   - [Installation](#installation)
@@ -33,6 +35,7 @@ However the model uploaded at the huggingfece hub is a sort of a preview version
   - [Dataset Preparation](#dataset-preparation)
   - [Training](#training)
     - [Full Finetuning](#full-finetuning)
+    - [Full Finetuning with 8-bit](#full-finetuning-with-8-bit)
     - [Finetune with LoRA](#finetune-with-lora)
       - [Merge LoRA Weights](#merge-lora-weights)
       - [Issue for libcudnn error](#issue-for-libcudnn-error)
@@ -118,6 +121,15 @@ To run the training script, use the following command:
 ```bash
 bash scripts/finetune.sh
 ```
+
+### Full Finetuning with 8-bit
+
+```bash
+bash scripts/finetune_8bit.sh
+```
+
+This script will finetune the model with fp8 model dtype. If you run out of vram, you could use this.
+You can even use offloading with fp8 training.
 
 ### Finetune with LoRA
 
