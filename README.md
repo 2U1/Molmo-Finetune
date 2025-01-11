@@ -16,7 +16,8 @@ However the model uploaded at the huggingfece hub is a sort of a preview version
 **[[Phi3-Vision Finetuning]](https://github.com/2U1/Phi3-Vision-Finetune)**<br>
 **[[Qwen2-VL Finetuning]](https://github.com/2U1/Qwen2-VL-Finetune)**<br>
 **[[LLAMA3.2-Vision Finetuning]](https://github.com/2U1/Llama3.2-Vision-Finetune)**<br>
-**[[Pixtral Finetune]](https://github.com/2U1/Pixtral-Finetune)**
+**[[Pixtral Finetune]](https://github.com/2U1/Pixtral-Finetune)**<br>
+**[[SmolVLM Finetune]](https://github.com/2U1/SmolVLM-Finetune)**
 
 ## Update
 
