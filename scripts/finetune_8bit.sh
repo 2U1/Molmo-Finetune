@@ -14,7 +14,7 @@ export PYTHONPATH=src:$PYTHONPATH
 # Also it only supports fp32 training
 
 deepspeed src/training/train.py \
-    --deepspeed scripts/zero3_fp8.json \
+    --deepspeed scripts/zero2_fp8.json \
     --model_id $MODEL_NAME \
     --data_path /path/to/your/training/data.json \
     --image_folder /path/to/your/image/folder \

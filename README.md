@@ -129,6 +129,7 @@ bash scripts/finetune.sh
 bash scripts/finetune_8bit.sh
 ```
 
+**You need to install [ms-amp](https://github.com/Azure/MS-AMP) to use this script.**<br>
 This script will finetune the model with fp8 model dtype. If you run out of vram, you could use this.
 You can even use offloading with fp8 training.
 
