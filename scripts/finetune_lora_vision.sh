@@ -16,6 +16,7 @@ export PYTHONPATH=src:$PYTHONPATH
 deepspeed src/training/train.py \
     --lora_enable True \
     --vision_lora True \
+    --use_dora False \
     --lora_rank 64 \
     --lora_alpha 128 \
     --lora_dropout 0.05 \
@@ -35,8 +36,9 @@ deepspeed src/training/train.py \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 1 \
     --learning_rate 2e-4 \
-    --weight_decay 0. \
+    --weight_decay 0.1 \
     --warmup_ratio 0.03 \
+    --adam_beta2 0.95
     --lr_scheduler_type "cosine" \
     --logging_steps 1 \
     --tf32 True \
