@@ -11,6 +11,8 @@ export PYTHONPATH=src:$PYTHONPATH
 # I can't find the exact embed_token so, its better to just tune the ff_out too.
 # --lora_namespan_exclude "['ff_out']"
 
+# img_projector is included in the vision_tower so, you should freeze the projector with it.
+
 deepspeed src/training/train.py \
     --lora_enable True \
     --vision_lora True \
@@ -22,9 +24,9 @@ deepspeed src/training/train.py \
     --model_id $MODEL_NAME \
     --data_path /path/to/your/training/data.json \
     --image_folder /path/to/your/image/folder \
-    --freeze_vision_tower False \
-    --freeze_llm False \
-    --tune_projector True \
+    --freeze_vision_tower True \
+    --freeze_llm True \
+    --tune_projector False \
     --bf16 True \
     --fp16 False \
     --disable_flash_attn2 False \
