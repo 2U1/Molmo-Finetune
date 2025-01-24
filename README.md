@@ -21,6 +21,7 @@ However the model uploaded at the huggingfece hub is a sort of a preview version
 
 ## Update
 
+- [2025/01/25] Fix error in LoRA training.
 - [2025/01/11] Updated 8-bit training with ms_amp using opt_level O3.
 - [2024/12/04] Add memory efficient 8-bit training.
 

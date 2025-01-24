@@ -112,6 +112,10 @@ def train():
         **bnb_model_from_pretrained_args
     )
 
+    model_to_configure = model.model
+    configure_llm(model_to_configure, training_args)
+    configure_vision_tower(model_to_configure, training_args, compute_dtype, training_args.device)
+
     model.config.use_cache = False
 
     if training_args.bits in [4,8]:
@@ -149,19 +153,6 @@ def train():
 
     # model.config.tokenizer_model_max_length = processor.tokenizer.model_max_length
     model.config.tokenizer_padding_side = processor.tokenizer.padding_side
-    
-    # When using LoRA, the model is rapped once more.
-    if training_args.lora_enable:
-        training_args.freeze_llm = True
-        model_to_configure = model.model.model
-        configure_llm(model_to_configure, training_args)
-
-    else:
-        model_to_configure = model.model
-        configure_llm(model_to_configure, training_args)
-
-    if not training_args.vision_lora:
-        configure_vision_tower(model_to_configure, training_args, compute_dtype, training_args.device)
 
     model.config.vision_lr = training_args.vision_lr
 
